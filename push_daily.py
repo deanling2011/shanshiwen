@@ -48,8 +48,6 @@ def main():
 
     m, d = md.split("-")
     desp = (
-        f"> 🌟 **历史上的今天**\n"
-        f"---\n"
         f"历年今日共 **{count}** 条内容，覆盖 **{years_n}** 个年份。\n\n"
         f"👉 [文字版在线阅读（免翻墙）]({GH}/archive/{md}.md)\n\n"
         f"🖼️ [图片版（免翻墙直连）]({GH}/img/{md}.png)"
