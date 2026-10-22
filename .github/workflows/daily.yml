@@ -45,6 +45,12 @@ jobs:
           # 若 fonts/ 存在则优先使用本地字体
           python build_daily.py
 
+      - name: Push to PushDeer
+        env:
+          PUSHDEER_KEY: ${{ secrets.PUSHDEER_KEY }}
+        run: |
+          python push_daily.py "$PUSHDEER_KEY"
+
       - name: Commit and push
         run: |
           git config user.name "github-actions[bot]"
