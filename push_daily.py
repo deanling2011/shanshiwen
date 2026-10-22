@@ -48,7 +48,7 @@ def main():
 
     m, d = md.split("-")
     desp = (
-        f"> 🌟 **《山人拾遗》{int(m)}月{int(d)}日 · 历史上的今天**\n"
+        f"> 🌟 **《山师文集》{int(m)}月{int(d)}日 · 历史上的今天**\n"
         f"---\n"
         f"历年今日共 **{count}** 条内容，覆盖 **{years_n}** 个年份。\n\n"
         f"👉 [文字版在线阅读（免翻墙）]({GH}/archive/{md}.md)\n\n"
@@ -58,7 +58,7 @@ def main():
 
     payload = urllib.parse.urlencode({
         "pushkey": pushkey,
-        "text": f"山人拾遗 {int(m)}月{int(d)}日",
+        "text": f"山师文集 {int(m)}月{int(d)}日",
         "desp": desp,
         "type": "markdown",
     }).encode("utf-8")

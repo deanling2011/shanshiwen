@@ -64,7 +64,7 @@ def build_markdown(md, data):
     os.makedirs(ARCHIVE_DIR, exist_ok=True)
     m, d = md.split("-")
     title = f"{int(m)}月{int(d)}日"
-    lines = [f"# {title} · 历史上的今天", ""]
+    lines = [f"# 山师文集 · {title} · 历史上的今天", ""]
     total = 0
     for g in data:
         lines.append(f"## {g['year']} 年")
@@ -158,7 +158,7 @@ def build_images(md, data):
     """单年一图 + 合并总览图"""
     os.makedirs(IMG_DIR, exist_ok=True)
     m, d = md.split("-")
-    md_title = f"{int(m)}月{int(d)}日 · 历史上的今天"
+    md_title = f"山师文集 · {int(m)}月{int(d)}日 · 历史上的今天"
 
     outputs = []
 
