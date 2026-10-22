@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>山人拾遗 · 历史上的今天</title>
+<meta name="description" content="每日文集归档，按年月日浏览历年今日内容">
+<style>
+  :root {
+    --bg: #0f1115;
+    --bg-soft: #161922;
+    --card: #1b1f2a;
+    --card-hover: #222837;
+    --border: #2a3040;
+    --text: #e8eaf0;
+    --text-dim: #9aa3b2;
+    --accent: #d4a25a;
+    --accent-soft: rgba(212, 162, 90, 0.12);
+    --red: #e05252;
+    --radius: 14px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC",
+      "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+    line-height: 1.7;
+    min-height: 100vh;
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+  .wrap { max-width: 760px; margin: 0 auto; padding: 16px 16px 48px; }
+
+  header.top {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 12px 0 20px;
+  }
+  .brand { font-size: 18px; font-weight: 700; letter-spacing: 1px; }
+  .brand .dot { color: var(--accent); }
+  .brand small { display:block; font-size: 11px; color: var(--text-dim); font-weight: 400; letter-spacing: 2px; }
+
+  /* 今日卡片 */
+  .today-card {
+    background: linear-gradient(135deg, #1e2433, #161922);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 20px;
+    margin-bottom: 20px;
+    position: relative;
+    overflow: hidden;
+  }
+  .today-card::before {
+    content: ''; position: absolute; top: -40px; right: -40px;
+    width: 140px; height: 140px; border-radius: 50%;
+    background: var(--accent-soft); filter: blur(30px);
+  }
+  .today-label { font-size: 12px; color: var(--accent); letter-spacing: 3px; margin-bottom: 6px; }
+  .today-date { font-size: 26px; font-weight: 700; }
+  .today-meta { font-size: 13px; color: var(--text-dim); margin-top: 4px; }
+  .today-actions { margin-top: 14px; display: flex; gap: 10px; flex-wrap: wrap; }
+  .btn {
+    display: inline-block; padding: 9px 18px; border-radius: 10px;
+    font-size: 14px; font-weight: 600; text-decoration: none; cursor: pointer;
+    border: 1px solid var(--border); color: var(--text);
+    background: var(--card); transition: all .15s;
+  }
+  .btn:hover { background: var(--card-hover); }
+  .btn.primary { background: var(--accent); color: #1a1408; border-color: var(--accent); }
+  .btn.primary:hover { filter: brightness(1.08); }
+
+  /* 内容区 */
+  .section-title { font-size: 15px; font-weight: 700; margin: 22px 0 12px; color: var(--text); }
+  .section-title .hint { font-size: 12px; color: var(--text-dim); font-weight: 400; margin-left: 8px; }
+
+  /* 年月导航 */
+  .nav-month {
+    display: flex; gap: 8px; overflow-x: auto; padding-bottom: 8px;
+    -webkit-overflow-scrolling: touch; scrollbar-width: none;
+  }
+  .nav-month::-webkit-scrollbar { display: none; }
+  .nav-month button {
+    flex: 0 0 auto; padding: 7px 14px; border-radius: 20px; border: 1px solid var(--border);
+    background: var(--card); color: var(--text-dim); font-size: 13px; cursor: pointer;
+    white-space: nowrap; transition: all .15s;
+  }
+  .nav-month button.active { background: var(--accent); color: #1a1408; border-color: var(--accent); font-weight: 600; }
+
+  .day-grid {
+    display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px;
+  }
+  .day-cell {
+    aspect-ratio: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
+    border-radius: 10px; background: var(--card); border: 1px solid var(--border);
+    cursor: pointer; transition: all .12s; position: relative;
+  }
+  .day-cell:hover { background: var(--card-hover); }
+  .day-cell .d { font-size: 15px; font-weight: 600; }
+  .day-cell .dot-ind { width: 5px; height: 5px; border-radius: 50%; background: var(--accent); margin-top: 3px; }
+  .day-cell.empty { background: transparent; border-color: transparent; cursor: default; }
+  .day-cell.empty:hover { background: transparent; }
+  .day-cell.no-data { opacity: .35; cursor: default; }
+  .day-cell.today { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent); }
+  .day-cell.today .d { color: var(--accent); }
+
+  /* 文集展示 */
+  .collection { display: none; }
+  .collection.show { display: block; }
+  .coll-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+  .coll-title { font-size: 18px; font-weight: 700; }
+  .coll-back { font-size: 13px; color: var(--accent); cursor: pointer; }
+  .year-group { margin-bottom: 20px; }
+  .year-tag {
+    display: inline-block; padding: 3px 12px; border-radius: 8px; font-size: 13px; font-weight: 700;
+    background: var(--accent-soft); color: var(--accent); margin-bottom: 10px;
+  }
+  .item {
+    background: var(--card); border: 1px solid var(--border); border-radius: 12px;
+    padding: 14px 16px; margin-bottom: 10px;
+  }
+  .item .idx { color: var(--text-dim); font-size: 12px; margin-bottom: 6px; }
+  .item .txt { font-size: 15px; white-space: pre-wrap; word-break: break-word; }
+
+  .loading { text-align: center; color: var(--text-dim); padding: 40px 0; font-size: 14px; }
+  .empty-tip { text-align: center; color: var(--text-dim); padding: 40px 0; font-size: 14px; }
+
+  footer { text-align: center; color: var(--text-dim); font-size: 12px; margin-top: 40px; }
+  footer a { color: var(--accent); text-decoration: none; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div class="brand">山人拾遗<span class="dot">·</span><small>历史上的今天</small></div>
+    <div class="today-meta" id="headerToday"></div>
+  </header>
+
+  <!-- 今日卡片 -->
+  <div class="today-card">
+    <div class="today-label">TODAY · 今日</div>
+    <div class="today-date" id="todayDate"></div>
+    <div class="today-meta" id="todayMeta">加载中…</div>
+    <div class="today-actions">
+      <a class="btn primary" id="todayRead" href="#">阅读今日文集</a>
+      <a class="btn" id="todayImg" href="#" target="_blank">查看图片版</a>
+    </div>
+  </div>
+
+  <!-- 月日导航 -->
+  <div class="section-title">按月浏览<span class="hint" id="navHint"></span></div>
+  <div class="nav-month" id="navMonth"></div>
+
+  <div class="section-title">选择日期<span class="hint">带金点 = 有内容</span></div>
+  <div class="day-grid" id="dayGrid"></div>
+
+  <!-- 文集展示 -->
+  <div class="collection" id="collection">
+    <div class="coll-head">
+      <div class="coll-title" id="collTitle"></div>
+      <div class="coll-back" id="collBack">← 返回日历</div>
+    </div>
+    <div id="collBody"></div>
+  </div>
+
+  <footer>
+    <div>数据区间 <span id="footRange"></span></div>
+    <div>由 <a href="https://github.com/deanling2011/shanwenji" target="_blank">shanwenji</a> 自动归档</div>
+  </footer>
+</div>
+
+<script>
+(function(){
+  var DATA_BASE = 'data/';
+  var index = null;      // index.json 内容
+  var meta = null;
+  var curMonth = null;   // 当前浏览月份 0-11
+  var curSelected = null; // 当前选中的 MM-DD
+
+  function pad(n){ return n < 10 ? '0'+n : ''+n; }
+  function todayMd(){
+    var t = new Date();
+    return pad(t.getMonth()+1) + '-' + pad(t.getDate());
+  }
+  function fullToday(){
+    var t = new Date();
+    return t.getFullYear() + '年' + (t.getMonth()+1) + '月' + t.getDate() + '日';
+  }
+
+  function loadJSON(path, cb){
+    var xhr = new XMLHttpRequest();
+    xhr.open('GET', path, true);
+    xhr.onload = function(){
+      if (xhr.status >= 200 && xhr.status < 300){
+        try { cb(JSON.parse(xhr.responseText)); }
+        catch(e){ cb(null); }
+      } else cb(null);
+    };
+    xhr.onerror = function(){ cb(null); };
+    xhr.send();
+  }
+
+  function init(){
+    var t = new Date();
+    curMonth = t.getMonth();
+    document.getElementById('todayDate').textContent = fullToday();
+    document.getElementById('headerToday').textContent = todayMd();
+
+    loadJSON(DATA_BASE + 'index.json', function(idx){
+      index = idx || {};
+      loadJSON(DATA_BASE + 'meta.json', function(m){
+        meta = m || {};
+        document.getElementById('footRange').textContent =
+          (meta.date_min||'') + ' ~ ' + (meta.date_max||'');
+        var md = todayMd();
+        var c = index[md] ? index[md].count : 0;
+        document.getElementById('todayMeta').textContent =
+          c > 0 ? ('历年今日共 ' + c + ' 条 · ' + index[md].years.length + ' 个年份')
+                : '这一天暂无内容';
+        var readBtn = document.getElementById('todayRead');
+        readBtn.onclick = function(e){ e.preventDefault(); showCollection(md); };
+        var imgBtn = document.getElementById('todayImg');
+        imgBtn.href = 'img/' + md + '.png';
+        if (c === 0) imgBtn.style.opacity = '.4';
+        buildMonthNav();
+        renderGrid();
+      });
+    });
+  }
+
+  function buildMonthNav(){
+    var nav = document.getElementById('navMonth');
+    nav.innerHTML = '';
+    var names = ['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月'];
+    var t = new Date();
+    var start = t.getMonth();  // 默认滚动到当前月附近
+    for (var i=0;i<12;i++){
+      (function(m){
+        var b = document.createElement('button');
+        b.textContent = names[m];
+        if (m === curMonth) b.className = 'active';
+        b.onclick = function(){ curMonth = m; buildMonthNav(); renderGrid(); };
+        nav.appendChild(b);
+      })(i);
+    }
+  }
+
+  function renderGrid(){
+    var grid = document.getElementById('dayGrid');
+    grid.innerHTML = '';
+    var t = new Date();
+    var isCurMonth = (curMonth === t.getMonth());
+    var isCurYear = true;
+    var firstDay = new Date(t.getFullYear(), curMonth, 1).getDay(); // 0=周日
+    var daysInMonth = new Date(t.getFullYear(), curMonth+1, 0).getDate();
+
+    document.getElementById('navHint').textContent =
+      (curMonth+1) + '月 · 共 ' + daysInMonth + ' 天';
+
+    for (var i=0;i<firstDay;i++){
+      var e = document.createElement('div');
+      e.className = 'day-cell empty';
+      grid.appendChild(e);
+    }
+    for (var d=1; d<=daysInMonth; d++){
+      (function(day){
+        var md = pad(curMonth+1) + '-' + pad(day);
+        var cell = document.createElement('div');
+        cell.className = 'day-cell';
+        var has = index[md];
+        if (!has) cell.classList.add('no-data');
+        var dn = document.createElement('span');
+        dn.className = 'd';
+        dn.textContent = day;
+        cell.appendChild(dn);
+        if (has){
+          var dot = document.createElement('span');
+          dot.className = 'dot-ind';
+          cell.appendChild(dot);
+        }
+        if (isCurMonth && day === t.getDate()){
+          cell.classList.add('today');
+        }
+        if (has){
+          cell.onclick = function(){ showCollection(md); };
+        }
+        grid.appendChild(cell);
+      })(d);
+    }
+  }
+
+  function showCollection(md){
+    curSelected = md;
+    var coll = document.getElementById('collection');
+    coll.classList.add('show');
+    document.getElementById('collTitle').textContent = md.replace('-','月') + '日 · 历年文集';
+    var body = document.getElementById('collBody');
+    body.innerHTML = '<div class="loading">加载中…</div>';
+    // 滚动到顶部
+    window.scrollTo({top:0, behavior:'smooth'});
+
+    loadJSON(DATA_BASE + md + '.json', function(data){
+      if (!data || data.length === 0){
+        body.innerHTML = '<div class="empty-tip">这一天暂无内容</div>';
+        return;
+      }
+      var html = '';
+      var total = 0;
+      data.forEach(function(g){
+        html += '<div class="year-group"><span class="year-tag">' + g.year + ' 年</span>';
+        g.items.forEach(function(txt, i){
+          total++;
+          html += '<div class="item"><div class="idx">#' + total + '</div>'
+                + '<div class="txt">' + escapeHtml(txt) + '</div></div>';
+        });
+        html += '</div>';
+      });
+      body.innerHTML = html;
+    });
+
+    document.getElementById('collBack').onclick = function(){
+      coll.classList.remove('show');
+      window.scrollTo({top:0, behavior:'smooth'});
+    };
+  }
+
+  function escapeHtml(s){
+    return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  }
+
+  init();
+})();
+</script>
+</body>
+</html>
