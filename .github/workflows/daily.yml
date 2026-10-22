@@ -2,8 +2,8 @@ name: Daily Archive
 
 on:
   schedule:
-    # 每天 UTC 16:20 = 北京时间 00:20
-    - cron: '20 16 * * *'
+    # 每天 UTC 16:25 = 北京时间 00:25
+    - cron: '25 16 * * *'
   workflow_dispatch: {}   # 支持手动触发
 
 permissions:
