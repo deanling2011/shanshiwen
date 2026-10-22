@@ -34,6 +34,16 @@ def build():
         else:
             bad.append((str(d), c))
 
+    # 数据修正：'2028-13-34' 为日期笔误，实际发布于 2018-05-11 20:08
+    # 将该条内容归入 2018-05-11
+    for bd, c in bad:
+        if str(bd) == "2028-13-34" and c:
+            fixed_date = datetime(2018, 5, 11).date()
+            fixed_content = "2018年5月11日 20:08 " + c.strip().strip("\u200b")
+            clean.append((fixed_date, fixed_content))
+            print(f"[修正] 2028-13-34 -> 2018-05-11: {fixed_content[:40]}...")
+            bad.remove((bd, c))
+
     by_md = defaultdict(list)
     for d, c in clean:
         by_md[(d.month, d.day)].append((d, c))

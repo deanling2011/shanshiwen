@@ -16,7 +16,7 @@ import urllib.request
 import urllib.parse
 from datetime import datetime
 
-REPO = "deanling2011/shanwenji"
+REPO = "deanling2011/shanshiwen"
 BRANCH = "main"
 # 国内免翻墙加速通道：ghproxy 镜像 raw 文件
 RAW = f"https://raw.githubusercontent.com/{REPO}/{BRANCH}"

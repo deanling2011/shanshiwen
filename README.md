@@ -1,4 +1,4 @@
-# 山师文集 · shanwenji
+# 山师文集 · shanshiwen
 
 每日自动归档「历史上的今天」文集：同一天（月-日）历年内容聚合展示，支持文字版网页浏览与图片版推送。
 
@@ -28,8 +28,8 @@
 
 使用 ghproxy 镜像加速 raw 文件：
 
-- 文字版：`https://ghproxy.net/https://raw.githubusercontent.com/deanling2011/shanwenji/main/archive/10-22.md`
-- 图片版：`https://ghproxy.net/https://raw.githubusercontent.com/deanling2011/shanwenji/main/img/10-22.png`
+- 文字版：`https://ghproxy.net/https://raw.githubusercontent.com/deanling2011/shanshiwen/main/archive/10-22.md`
+- 图片版：`https://ghproxy.net/https://raw.githubusercontent.com/deanling2011/shanshiwen/main/img/10-22.png`
 
 ## 手动触发
 
