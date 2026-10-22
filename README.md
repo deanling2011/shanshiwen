@@ -26,8 +26,10 @@
 
 ## CDN 直连（国内免翻墙）
 
-- 文字版：`https://cdn.jsdelivr.net/gh/deanling2011/shanwenji@main/archive/10-22.md`
-- 图片版：`https://cdn.jsdelivr.net/gh/deanling2011/shanwenji@main/img/10-22.png`
+使用 ghproxy 镜像加速 raw 文件：
+
+- 文字版：`https://ghproxy.net/https://raw.githubusercontent.com/deanling2011/shanwenji/main/archive/10-22.md`
+- 图片版：`https://ghproxy.net/https://raw.githubusercontent.com/deanling2011/shanwenji/main/img/10-22.png`
 
 ## 手动触发
 

@@ -164,7 +164,6 @@
 
   <footer>
     <div>数据区间 <span id="footRange"></span></div>
-    <div>由 <a href="https://github.com/deanling2011/shanwenji" target="_blank">shanwenji</a> 自动归档</div>
   </footer>
 </div>
 
@@ -219,7 +218,7 @@
         var readBtn = document.getElementById('todayRead');
         readBtn.onclick = function(e){ e.preventDefault(); showCollection(md); };
         var imgBtn = document.getElementById('todayImg');
-        imgBtn.href = 'img/' + md + '.png';
+        imgBtn.href = 'https://ghproxy.net/https://raw.githubusercontent.com/deanling2011/shanwenji/main/img/' + md + '.png';
         if (c === 0) imgBtn.style.opacity = '.4';
         buildMonthNav();
         renderGrid();

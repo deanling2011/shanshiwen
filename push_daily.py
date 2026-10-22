@@ -18,8 +18,9 @@ from datetime import datetime
 
 REPO = "deanling2011/shanwenji"
 BRANCH = "main"
-CDN = f"https://cdn.jsdelivr.net/gh/{REPO}@{BRANCH}"
-PAGES = f"https://{REPO.split('/')[0]}.github.io/{REPO.split('/')[1]}"
+# 国内免翻墙加速通道：ghproxy 镜像 raw 文件
+RAW = f"https://raw.githubusercontent.com/{REPO}/{BRANCH}"
+GH = f"https://ghproxy.net/{RAW}"
 
 
 def pad(n):
@@ -50,9 +51,8 @@ def main():
         f"> 🌟 **《山人拾遗》{int(m)}月{int(d)}日 · 历史上的今天**\n"
         f"---\n"
         f"历年今日共 **{count}** 条内容，覆盖 **{years_n}** 个年份。\n\n"
-        f"👉 [文字版在线阅读（免翻墙）]({CDN}/archive/{md}.md)\n\n"
-        f"🖼️ [图片版（免翻墙直连）]({CDN}/img/{md}.png)\n\n"
-        f"📖 [按月日浏览全部文集]({PAGES})\n\n"
+        f"👉 [文字版在线阅读（免翻墙）]({GH}/archive/{md}.md)\n\n"
+        f"🖼️ [图片版（免翻墙直连）]({GH}/img/{md}.png)\n\n"
         f"—— 每日 08:00 准时送达 ——"
     )
 

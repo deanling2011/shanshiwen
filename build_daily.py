@@ -73,8 +73,6 @@ def build_markdown(md, data):
             total += 1
             lines.append(txt)
             lines.append("")
-    lines.append("---")
-    lines.append(f"*共 {total} 条，覆盖 {len(data)} 个年份。数据来源：山人拾遗*")
     out = os.path.join(ARCHIVE_DIR, f"{md}.md")
     with open(out, "w", encoding="utf-8") as f:
         f.write("\n".join(lines))
