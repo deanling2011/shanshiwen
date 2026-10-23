@@ -180,11 +180,11 @@ def build_images(md, data):
         render_card(md_title, sub, blocks, out, foot=None)
         outputs.append(out)
 
-    # 合并总览图 MM-DD.png（备用）
+    # 合并总览图 MM-DD.png（备用），条目全程连续编号
     blocks = []
+    idx = 0
     for g in data:
         wrapped_items = []
-        idx = 0
         for txt in g["items"]:
             idx += 1
             ws = wrap_text(txt, ImageFont.truetype(FONT_REG, 34), W - MARGIN * 2)
