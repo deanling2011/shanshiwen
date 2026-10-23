@@ -132,7 +132,6 @@
 <div class="wrap">
   <header class="top">
     <div class="brand">山师文集<span class="dot">·</span><small>历史上的今天</small></div>
-    <div class="today-meta" id="headerToday"></div>
   </header>
 
   <!-- 今日卡片 -->
@@ -202,7 +201,6 @@
     var t = new Date();
     curMonth = t.getMonth();
     document.getElementById('todayDate').textContent = fullToday();
-    document.getElementById('headerToday').textContent = todayMd();
 
     loadJSON(DATA_BASE + 'index.json', function(idx){
       index = idx || {};
