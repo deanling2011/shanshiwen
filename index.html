@@ -40,6 +40,43 @@
   .brand .dot { color: var(--accent); }
   .brand small { display:block; font-size: 11px; color: var(--text-dim); font-weight: 400; letter-spacing: 2px; }
 
+  /* 站点切换导航 */
+  .switcher {
+    display: flex; align-items: center; gap: 3px;
+    padding: 3px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    box-shadow: 0 4px 16px rgba(0,0,0,.28);
+    flex-shrink: 0;
+    animation: swIn .5s ease both;
+  }
+  @keyframes swIn { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: none; } }
+  .switcher .sw {
+    display: inline-flex; align-items: center; gap: 5px;
+    padding: 6px 13px; border-radius: 999px;
+    font-size: 13px; font-weight: 600; letter-spacing: .5px;
+    color: var(--text-dim); text-decoration: none; cursor: pointer;
+    transition: color .2s, background .2s, box-shadow .2s, transform .2s;
+    white-space: nowrap; position: relative;
+  }
+  .switcher .sw:hover { color: var(--text); }
+  .switcher .sw:not(.active):hover { transform: translateY(-1px); }
+  .switcher .sw.active {
+    background: linear-gradient(135deg, var(--accent), #e6bb7a);
+    color: #1a1408; cursor: default;
+    box-shadow: 0 2px 10px rgba(212,162,90,.42);
+  }
+  .switcher .sw .arrow {
+    font-size: 11px; line-height: 1; opacity: 0;
+    transform: translate(-3px, 3px); transition: all .2s ease;
+  }
+  .switcher .sw:not(.active):hover .arrow { opacity: 1; transform: translate(0, 0); }
+  @media (max-width: 420px) {
+    .switcher .sw { padding: 5px 10px; font-size: 12px; gap: 3px; }
+    .brand { font-size: 16px; }
+  }
+
   /* 今日卡片 */
   .today-card {
     background: linear-gradient(135deg, #1e2433, #161922);
@@ -132,6 +169,10 @@
 <div class="wrap">
   <header class="top">
     <div class="brand">山师文集<span class="dot">·</span><small>历史上的今天</small></div>
+    <nav class="switcher" aria-label="站点导航">
+      <span class="sw active">📖 文集</span>
+      <a class="sw" href="https://deanling2011.github.io/shanshitu/" target="_blank" rel="noopener" title="前往山师图集">🖼️ 图集<span class="arrow">↗</span></a>
+    </nav>
   </header>
 
   <!-- 今日卡片 -->
