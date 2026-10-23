@@ -103,29 +103,31 @@ def render_card(title, subtitle, blocks, out_path, foot=None):
     """
     渲染一张卡片图。
     blocks: [(year_or_None, [wrapped_lines])]
+    采用两遍法：先精确计算内容总高，再创建画布绘制，避免内容被截断。
     """
     font_title = ImageFont.truetype(FONT_BOLD, 52)
     font_sub = ImageFont.truetype(FONT_REG, 30)
     font_year = ImageFont.truetype(FONT_BOLD, 38)
     font_body = ImageFont.truetype(FONT_REG, 34)
 
-    content_w = W - MARGIN * 2
+    def measure(y=0):
+        y += MARGIN
+        y += 84                                        # 标题
+        if subtitle:
+            y += 46
+        y += 24
+        for year, yl in blocks:
+            if year is not None:
+                y += 62
+            y += len(yl) * LINE_H
+            y += 20
+        if foot:
+            y += 56
+        return y
 
-    # 预计算总高
-    total_h = MARGIN
-    total_h += 80          # 标题
-    if subtitle:
-        total_h += 44
-    total_h += 30
-    for year, yl in blocks:
-        if year is not None:
-            total_h += 60
-        total_h += len(yl) * LINE_H
-        total_h += 20
-    total_h += 70          # 底部脚注
-    total_h += MARGIN // 2
-
-    img = Image.new("RGB", (W, max(total_h, 500)), BG)
+    end_y = measure()
+    H = end_y + MARGIN // 2
+    img = Image.new("RGB", (W, max(H, 500)), BG)
     draw = ImageDraw.Draw(img)
 
     y = MARGIN
@@ -149,7 +151,7 @@ def render_card(title, subtitle, blocks, out_path, foot=None):
         draw.text((MARGIN, y + 6), foot, font=font_sub, fill=DIM)
         y += 56
 
-    img = img.crop((0, 0, W, min(y + MARGIN // 2, total_h)))
+    img = img.crop((0, 0, W, min(y + MARGIN // 2, img.height)))
     img.save(out_path, "PNG")
     return out_path
 
