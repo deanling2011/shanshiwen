@@ -12,6 +12,8 @@ permissions:
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      TZ: Asia/Shanghai   # 保证 datetime.now() 使用北京时间，生成正确的日期图片
     steps:
       - uses: actions/checkout@v4
 
