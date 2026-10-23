@@ -66,3 +66,5 @@ jobs:
             git commit -m "daily archive $(date -u -d '+8 hours' '+%Y-%m-%d')"
             git push
           fi
+
+# rebuild trigger 2026-10-23
