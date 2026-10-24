@@ -162,8 +162,16 @@
   .day-cell.empty { background: transparent; border-color: transparent; cursor: default; }
   .day-cell.empty:hover { background: transparent; }
   .day-cell.no-data { opacity: .35; cursor: default; }
-  .day-cell.today { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent); }
+  /* 今天：淡金细圈，只作"今天在哪"的定位参考，不抢视觉 */
+  .day-cell.today { border-color: rgba(212,162,90,.42); }
   .day-cell.today .d { color: var(--accent); }
+  /* 选中：当前正在看的那天，实心高亮。写在 .today 之后，同时命中时以选中为准 */
+  .day-cell.selected {
+    border-color: var(--accent);
+    background: rgba(212,162,90,.13);
+    box-shadow: 0 0 0 1.5px var(--accent), 0 4px 14px rgba(212,162,90,.20);
+  }
+  .day-cell.selected .d { color: var(--accent); }
 
   /* 文集展示 */
   .collection { display: none; }
@@ -501,6 +509,8 @@
         if (isCurMonth && day === t.getDate()){
           cell.classList.add('today');
         }
+        cell.setAttribute('data-md', md);
+        if (md === curSelected) cell.classList.add('selected');
         if (has){
           cell.onclick = function(){ showCollection(md); };
         }
@@ -509,14 +519,23 @@
     }
   }
 
+  function syncSelection(){
+    var cells = document.getElementById('dayGrid').children;
+    for (var i = 0; i < cells.length; i++){
+      var md = cells[i].getAttribute('data-md');
+      cells[i].classList.toggle('selected', !!md && md === curSelected);
+    }
+  }
+
   function showCollection(md){
     curSelected = md;
+    syncSelection();
     var coll = document.getElementById('collection');
     coll.classList.add('show');
     document.getElementById('collTitle').textContent = md.replace('-','月') + '日 · 历年文集';
     var body = document.getElementById('collBody');
     body.innerHTML = '<div class="loading">加载中…</div>';
-    window.scrollTo({top:0, behavior:'smooth'});
+    // 不再强制 window.scrollTo(top:0)：点日期时页面停在原处，交给金圈做反馈
 
     loadJSON(DATA_BASE + md + '.json', function(data){
       if (!data || data.length === 0){
@@ -538,6 +557,8 @@
     });
 
     document.getElementById('collBack').onclick = function(){
+      curSelected = null;
+      syncSelection();
       coll.classList.remove('show');
       window.scrollTo({top:0, behavior:'smooth'});
     };
