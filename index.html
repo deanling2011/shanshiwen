@@ -179,6 +179,16 @@
   .coll-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
   .coll-title { font-size: 18px; font-weight: 700; }
   .coll-back { font-size: 13px; color: var(--accent); cursor: pointer; }
+  .coll-actions { display: flex; gap: 10px; flex-wrap: wrap; margin: -4px 0 16px; }
+  .coll-img-btn {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 8px 14px; border-radius: 10px; font-size: 13px; font-weight: 600;
+    text-decoration: none; cursor: pointer;
+    border: 1px solid var(--accent); color: var(--accent); background: var(--accent-soft);
+    transition: all .15s;
+  }
+  .coll-img-btn:hover { background: var(--accent); color: #1a1408; }
+  .coll-img-btn.disabled { opacity: .4; cursor: default; pointer-events: none; }
   .year-group { margin-bottom: 20px; }
   .year-tag {
     display: inline-block; padding: 3px 12px; border-radius: 8px; font-size: 13px; font-weight: 700;
@@ -233,6 +243,9 @@
       <div class="coll-title" id="collTitle"></div>
       <div class="coll-back" id="collBack">← 返回日历</div>
     </div>
+    <div class="coll-actions">
+      <a class="coll-img-btn" id="collImg" href="#" target="_blank">🖼️ 查看图片版</a>
+    </div>
     <div id="collBody"></div>
   </div>
 
@@ -257,6 +270,9 @@
   function fullToday(){
     var t = new Date();
     return t.getFullYear() + '年' + (t.getMonth()+1) + '月' + t.getDate() + '日';
+  }
+  function imgUrl(md){
+    return 'https://ghproxy.net/https://raw.githubusercontent.com/deanling2011/shanshiwen/main/img/' + md + '.png';
   }
 
   /* ================= 农历算法（1900-2100，已用权威历法库验证） ================= */
@@ -412,7 +428,7 @@
         var readBtn = document.getElementById('todayRead');
         readBtn.onclick = function(e){ e.preventDefault(); showCollection(md); };
         var imgBtn = document.getElementById('todayImg');
-        imgBtn.href = 'https://ghproxy.net/https://raw.githubusercontent.com/deanling2011/shanshiwen/main/img/' + md + '.png';
+        imgBtn.href = imgUrl(md);
         if (c === 0) imgBtn.style.opacity = '.4';
         buildMonthNav();
         renderGrid();
@@ -533,6 +549,10 @@
     var coll = document.getElementById('collection');
     coll.classList.add('show');
     document.getElementById('collTitle').textContent = md.replace('-','月') + '日 · 历年文集';
+    // 图片版按钮：指向该日期的总览图（已为全部历史日期补全）
+    var imgBtn = document.getElementById('collImg');
+    imgBtn.href = imgUrl(md);
+    imgBtn.classList.remove('disabled');
     var body = document.getElementById('collBody');
     body.innerHTML = '<div class="loading">加载中…</div>';
     // 不再强制 window.scrollTo(top:0)：点日期时页面停在原处，交给金圈做反馈
@@ -540,6 +560,7 @@
     loadJSON(DATA_BASE + md + '.json', function(data){
       if (!data || data.length === 0){
         body.innerHTML = '<div class="empty-tip">这一天暂无内容</div>';
+        imgBtn.classList.add('disabled');
         return;
       }
       var html = '';
