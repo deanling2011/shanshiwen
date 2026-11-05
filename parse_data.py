@@ -10,18 +10,56 @@
 这样网页加载「历史上的今天」只需请求一个几十 KB 的小文件，秒开。
 """
 import openpyxl
+import glob
 import json
 import os
+import re
 from datetime import datetime
 from collections import defaultdict, OrderedDict
 
+# 源表按「改一次存一个新文件名」（shanshi_文集26.11.5.xlsx → 26.11.6 …），
+# 这里取 Downloads 里最新的一个，避免每次手改路径。
+SRC_PATTERNS = [
+    r"D:/ext.lingzicheng1/Downloads/shanshi_文集*.xlsx",
+    r"D:/ext.lingzicheng1/Downloads/shanshi_cleaned*.xlsx",
+]
 SRC = r"D:/ext.lingzicheng1/Downloads/shanshi_cleaned.xlsx"
 OUT_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
 os.makedirs(OUT_DIR, exist_ok=True)
 
+# 正文开头的日期（微博原文 / 天涯楼层）
+RE_TEXT_DATE = re.compile(r"^\s*(\d{4})年(\d{1,2})月(\d{1,2})日")
+RE_FLOOR_DATE = re.compile(r"日期:\s*(\d{4})-(\d{1,2})-(\d{1,2})")
+
+
+def find_src():
+    """取本地最新的源表；找不到就退回写死路径。"""
+    cands = []
+    for pat in SRC_PATTERNS:
+        cands.extend(glob.glob(pat))
+    if not cands:
+        return SRC
+    return max(cands, key=os.path.getmtime)
+
+
+def reconcile_date(d, c):
+    """Date 列与正文日期不一致时以正文为准（源表手改常漏 Date 列）。"""
+    m = RE_TEXT_DATE.match(c) or RE_FLOOR_DATE.search(c)
+    if not m:
+        return d
+    try:
+        td = datetime(int(m.group(1)), int(m.group(2)), int(m.group(3))).date()
+    except ValueError:
+        return d
+    if td != d:
+        print(f"[日期校正] Date={d} -> 正文={td} | {c[:40]}...")
+    return td
+
 
 def build():
-    wb = openpyxl.load_workbook(SRC, read_only=True, data_only=True)
+    src = find_src()
+    print(f"源表: {src}")
+    wb = openpyxl.load_workbook(src, read_only=True, data_only=True)
     ws = wb["shanshi_cleaned"]
     rows = list(ws.iter_rows(values_only=True))[1:]
 
@@ -30,7 +68,8 @@ def build():
     for r in rows:
         d, c = r[0], r[1]
         if isinstance(d, datetime) and isinstance(c, str) and c.strip():
-            clean.append((d.date(), c.strip()))
+            c = c.strip()
+            clean.append((reconcile_date(d.date(), c), c))
         else:
             bad.append((str(d), c))
 
