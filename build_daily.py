@@ -17,6 +17,7 @@
 """
 import json
 import os
+import re
 import sys
 from datetime import datetime
 from PIL import Image, ImageDraw, ImageFont
@@ -45,6 +46,28 @@ ACCENT = (212, 162, 90)
 
 def pad(n):
     return f"{n:02d}"
+
+
+# 微信复制常带进零宽字符（U+200B 等）和 emoji，msyh 字体渲染不出来就是豆腐块，
+# 出图前统一清掉。零宽/变体选择符/组合符必须清，emoji 主体也一并去掉。
+_EMOJI_RE = re.compile(
+    "["
+    "\u200b-\u200f"            # 零宽空格/连接符/方向标记
+    "\u202a-\u202e"
+    "\u2060-\u2064"
+    "\ufe00-\ufe0f"            # 变体选择符
+    "\u20d0-\u20ff"            # 组合用符号
+    "\U0001f000-\U0001faff"    # emoji 主体
+    "\u2600-\u27bf"            # 杂项符号/装饰符号
+    "\u2b00-\u2bff"
+    "\ufe0f"
+    "]+"
+)
+
+
+def clean_text(s):
+    """去掉渲染不出来的零宽字符和 emoji，避免出现豆腐块。"""
+    return _EMOJI_RE.sub("", s).replace("\u3000", " ").strip()
 
 
 def today_md():
@@ -163,6 +186,8 @@ def build_images(md, data):
     md_title = f"山师文集 · {int(m)}月{int(d)}日 · 历史上的今天"
 
     outputs = []
+    font_body = ImageFont.truetype(FONT_REG, 34)
+    inner_w = W - MARGIN * 2
 
     # 单年一图：MM-DD-YYYY.png
     for g in data:
@@ -171,9 +196,9 @@ def build_images(md, data):
         idx = 0
         for txt in g["items"]:
             idx += 1
-            wrapped = wrap_text(txt, ImageFont.truetype(FONT_REG, 34), W - MARGIN * 2)
-            # 条目编号放首行前缀
-            wrapped[0] = f"#{idx}  {wrapped[0]}" if len(wrapped) else f"#{idx}"
+            # 编号必须先拼到文本最前、再整体换行；先换行后加编号会让首行超宽，
+            # 右侧文字被画布边缘切掉（历史 bug，勿改回）
+            wrapped = wrap_text(f"#{idx}  {clean_text(txt)}", font_body, inner_w)
             blocks.append((None, wrapped))
         sub = f"{year} 年 · 共 {len(g['items'])} 条"
         out = os.path.join(IMG_DIR, f"{md}-{year}.png")
@@ -187,10 +212,8 @@ def build_images(md, data):
         wrapped_items = []
         for txt in g["items"]:
             idx += 1
-            ws = wrap_text(txt, ImageFont.truetype(FONT_REG, 34), W - MARGIN * 2)
-            if ws:
-                ws[0] = f"#{idx}  {ws[0]}"
-            wrapped_items.extend(ws)
+            wrapped_items.extend(
+                wrap_text(f"#{idx}  {clean_text(txt)}", font_body, inner_w))
         blocks.append((g["year"], wrapped_items))
     total_n = sum(len(g["items"]) for g in data)
     out = os.path.join(IMG_DIR, f"{md}.png")
